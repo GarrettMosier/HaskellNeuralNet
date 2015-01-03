@@ -33,3 +33,4 @@ test-suite stack-test
   build-depends:       base
                      , mtl
                      , hspec
+                     

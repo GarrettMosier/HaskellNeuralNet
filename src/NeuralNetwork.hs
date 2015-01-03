@@ -1,10 +1,9 @@
-module NeuralNetwork  where
+module NeuralNetwork where
 
 import Control.Monad
 import System.Random
 import Data.List
 import Data.Function
-import Data.Char
 
 
 type Weight = Double

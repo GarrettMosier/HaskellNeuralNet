@@ -1,10 +1,6 @@
 import Text.CSV
 import Text.Parsec.Error
 import Data.Char
-import System.Random 
-import Control.Monad 
-import Data.List
-import Data.Function
 import NeuralNetwork 
 
 type Accuracy = Double
