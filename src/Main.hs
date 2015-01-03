@@ -68,8 +68,24 @@ crossover w1 w2 crossoverRate = fmap (pickSide w1 w2) (randomIO :: IO Bool)
     where pickSide optOne optTwo b = if b then optOne else optTwo
 
 
-mutateWeights :: NetworkWeights -> MutationRate -> NetworkWeights
-mutateWeights weights mutationRate = weights 
+-- Taken from Stack Overflow
+pick :: [a] -> IO a
+pick xs = randomRIO (0, length xs - 1) >>= return . (xs !!)
+ 
+
+mutateWeights :: NetworkWeights -> MutationRate -> IO NetworkWeights
+mutateWeights weights mutationRate = return weights
+    where mutationOperators = [(+), (*), (-), (/)]
+          potentiallyMutateWeight = fmap (> mutationRate) (randomIO :: IO Double)
+          selectOperator = pick mutationOperators 
+          --blah = traverse
+          -- Use liftM2 to get both the weight and boolean?
+          pickWeight = \weight -> \x -> if x then weight else weight
+
+
+
+traverse :: (Weight -> Weight) -> NetworkWeights -> NetworkWeights
+traverse operator val = (fmap . fmap) operator val
 
 
 getNextGeneration :: MutationRate -> CrossoverRate -> NetworkWeights -> NetworkWeights
