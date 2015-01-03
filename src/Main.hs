@@ -5,14 +5,7 @@ import System.Random
 import Control.Monad 
 import Data.List
 import Data.Function
-
-
-type Classifier = Mushroom -> Edibile
-type Edibile = Bool
-
-type Mushroom = [Int]
-type LabeledMushroom = (Edibile, Mushroom)
-type LabeledMushrooms = [LabeledMushroom]
+import NeuralNetwork 
 
 type Accuracy = Double
 type FoldCount = Int
@@ -23,21 +16,6 @@ type AlphaFeatureVector = [AlphaFeature]
 type NumericFeature = Int
 type NumericFeatureVector = [NumericFeature]
 
-type MutationRate = Double
-type CrossoverRate = Double
-type NodeInput = LayerWeights
-type NodesPerLayer = Int
-
-defaultCrossoverRate :: CrossoverRate
-defaultCrossoverRate = 0.6
-
-defaultMutationRate :: MutationRate
-defaultMutationRate = 0.05
-
-
-getCorrectPredictionCount :: LabeledMushrooms -> Classifier -> Int
-getCorrectPredictionCount mushrooms classifier = length $ filter correctlyClassified mushrooms
-                          where correctlyClassified (edibility, mushroom) = classifier mushroom ==  edibility
 
 
 calculateAccuracy :: Classifier -> LabeledMushrooms -> Accuracy
@@ -72,9 +50,6 @@ alphaVecToNumericVec = map alphaFeatureToNumericFeature
 getClassifier :: LabeledMushrooms -> Classifier
 getClassifier mushrooms = \mushroom -> True
 
-testMushrooms :: LabeledMushrooms
-testMushrooms = [(True, [1,2,3])]
-
 
 getMushroomData :: IO (Either ParseError LabeledMushrooms)
 getMushroomData = convertCSV parsedCSV
@@ -88,7 +63,7 @@ convertCSV parsedCSV = inject (map getLabeledMushroom) parsedCSV
            
 
 getLabeledMushroom :: AlphaFeatureVector -> LabeledMushroom
-getLabeledMushroom [] = (True, [1,2,3])
+getLabeledMushroom [] = (True, [1,2,3]) -- TODO Convert to Maybe LabeledMushroom
 getLabeledMushroom (edibility : mushroom) = (isEdible edibility, mushroomFeature)
                    where isEdible = (== "e")
                          mushroomFeature = alphaVecToNumericVec mushroom 

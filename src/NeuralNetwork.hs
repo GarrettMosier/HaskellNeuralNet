@@ -1,8 +1,42 @@
+module NeuralNetwork  where
+
+import Control.Monad
+import System.Random
+import Data.List
+import Data.Function
+import Data.Char
+
 
 type Weight = Double
 type LayerWeights = [Weight]
 type NetworkWeights = [LayerWeights]
 type GenerationOfNetworkWeights = [NetworkWeights]
+
+type NodeInput = LayerWeights
+
+type MutationRate = Double
+type CrossoverRate = Double
+
+type Classifier = Mushroom -> Edibile
+type Edibile = Bool
+
+type Mushroom = [Int]
+type LabeledMushroom = (Edibile, Mushroom)
+type LabeledMushrooms = [LabeledMushroom]
+
+type NodesPerLayer = Int
+
+
+defaultCrossoverRate :: CrossoverRate
+defaultCrossoverRate = 0.6
+
+defaultMutationRate :: MutationRate
+defaultMutationRate = 0.05
+
+getCorrectPredictionCount :: LabeledMushrooms -> Classifier -> Int
+getCorrectPredictionCount mushrooms classifier = length $ filter correctlyClassified mushrooms
+                          where correctlyClassified (edibility, mushroom) = classifier mushroom ==  edibility
+
 
 -- Can likely just pass in * as an operator
 -- Make sure both are same size
