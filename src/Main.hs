@@ -3,8 +3,9 @@ import Text.Parsec.Error
 import Data.Char
 import System.Random 
 import Control.Monad 
-
-
+import Data.List
+import Data.Ord
+import Data.Function
 
 
 type Classifier = Mushroom -> Edibile
@@ -20,6 +21,7 @@ type FoldCount = Int
 type Weight = Double
 type LayerWeights = [Weight]
 type NetworkWeights = [LayerWeights]
+type GenerationOfNetworkWeights = [NetworkWeights]
 
 type AlphaFeature = String
 type AlphaFeatureVector = [AlphaFeature]
@@ -49,8 +51,13 @@ getCorrectPredictionCount mushrooms classifier = length $ filter correctlyClassi
                           where correctlyClassified (edibility, mushroom) = classifier mushroom ==  edibility
 
 
-getRankedPopulation :: LabeledMushrooms -> NetworkWeights -> NetworkWeights
-getRankedPopulation mushrooms weights = weights
+getRankedPopulation :: LabeledMushrooms -> GenerationOfNetworkWeights -> GenerationOfNetworkWeights
+getRankedPopulation mushrooms unrankedWeights = rankedWeights
+    where rankedWeights = map fst rankedWeightsWithAccuracy
+          classifiers = map makeClassifierWithWeights unrankedWeights
+          accuracies = map (getCorrectPredictionCount mushrooms) classifiers
+          unrankedWeightsWithAccuracy = zip unrankedWeights accuracies
+          rankedWeightsWithAccuracy  = sortBy (compare `on` snd) unrankedWeightsWithAccuracy
 
 
 updateWeights :: LabeledMushrooms -> NetworkWeights -> NetworkWeights 
