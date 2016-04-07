@@ -115,7 +115,13 @@ getInitialWeights nodesPerLayer = replicateM layerCount $ replicateM nodesPerLay
 
 
 makeClassifierWithWeights :: NetworkWeights -> Classifier
-makeClassifierWithWeights weights = getClassifier testMushrooms
+makeClassifierWithWeights (initialWeights:restWeights) = classifier
+-- reduce for each layer in the network and check the last value
+    where classifier = \_ -> True
+          --myClass = foldr reduceFunction initialWeights 
+          reduceFunction singleLayerWeights = map isActive singleLayerWeights 
+
+
 
 testMushrooms :: LabeledMushrooms
 testMushrooms = [(True, [1,2,3])]
