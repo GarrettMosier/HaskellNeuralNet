@@ -63,8 +63,9 @@ updateWeights :: LabeledMushrooms -> NetworkWeights -> NetworkWeights
 updateWeights mushrooms weights = weights
 
 
-crossover :: NetworkWeights -> NetworkWeights -> CrossoverRate -> NetworkWeights
-crossover w1 w2 crossoverRate = w1
+crossover :: NetworkWeights -> NetworkWeights -> CrossoverRate -> IO NetworkWeights
+crossover w1 w2 crossoverRate = fmap (pickSide w1 w2) (randomIO :: IO Bool)
+    where pickSide optOne optTwo b = if b then optOne else optTwo
 
 
 mutateWeights :: NetworkWeights -> MutationRate -> NetworkWeights
