@@ -4,7 +4,6 @@ import Data.Char
 import System.Random 
 import Control.Monad 
 import Data.List
-import Data.Ord
 import Data.Function
 
 
@@ -118,9 +117,11 @@ makeClassifierWithWeights :: NetworkWeights -> Classifier
 makeClassifierWithWeights (initialWeights:restWeights) = classifier
 -- reduce for each layer in the network and check the last value
     where classifier = \_ -> True
-          --myClass = foldr reduceFunction initialWeights 
-          reduceFunction singleLayerWeights = map isActive singleLayerWeights 
-
+          --myClass = foldl reduceFunction initialWeights restWeights
+          reduceFunction singleLayerWeights singleLayerInput = map mapFunc singleLayerWeights 
+          mapFunc singleLayerInput = boolToWeight . (isActive singleLayerInput)           
+          boolToWeight True = 1.0
+          boolToWeight False = 0.0
 
 
 testMushrooms :: LabeledMushrooms
