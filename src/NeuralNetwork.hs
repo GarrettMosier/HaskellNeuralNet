@@ -74,9 +74,11 @@ mutateWeights weights mutationRate = return weights
     where mutationOperators = [(+), (*), (-), (/)]
           potentiallyMutateWeight = fmap (> mutationRate) (randomIO :: IO Double)
           selectOperator = pick mutationOperators 
-          --blah = traverse
+          --blah = traverse finalWeight weights
+
           -- Use liftM2 to get both the weight and boolean?
-          pickWeight = \weight -> \x -> if x then weight else weight
+          finalWeight originalWeight = liftM4 pickWeight originalWeight potentiallyMutateWeight selectOperator (randomIO :: IO Double)
+          pickWeight = \originalWeight -> \willMutate -> \operator -> \otherWeight -> if willMutate then operator originalWeight otherWeight else originalWeight
 
 
 
@@ -84,8 +86,8 @@ traverse :: (Weight -> Weight) -> NetworkWeights -> NetworkWeights
 traverse operator val = (fmap . fmap . fmap) operator val
 
 
-getNextGeneration :: MutationRate -> CrossoverRate -> NetworkWeights -> NetworkWeights
-getNextGeneration mutationRate crossoverRate weights = weights
+getNextGeneration :: MutationRate -> CrossoverRate -> NetworkWeights -> IO NetworkWeights
+getNextGeneration mutationRate crossoverRate weights = return weights
 
 
 
