@@ -7,11 +7,13 @@ import Data.Function
 
 
 type Weight = Double
-type LayerWeights = [Weight]
-type NetworkWeights = [LayerWeights]
+type NodeWeight = [Weight]
+type LayerWeight = [NodeWeight]
+type NetworkWeights = [LayerWeight]
 type GenerationOfNetworkWeights = [NetworkWeights]
 
-type NodeInput = LayerWeights
+type NodeInput = Weight
+type NodeInputForLayer = NodeWeight
 
 type MutationRate = Double
 type CrossoverRate = Double
@@ -39,7 +41,7 @@ getCorrectPredictionCount mushrooms classifier = length $ filter correctlyClassi
 
 -- Can likely just pass in * as an operator
 -- Make sure both are same size
-isActive :: NodeInput -> LayerWeights -> Bool
+isActive :: NodeInputForLayer -> NodeWeight -> Bool
 isActive input weights = summedInput > 0
     where summedInput = sum $ zipWith (*) input weights
 
@@ -79,7 +81,7 @@ mutateWeights weights mutationRate = return weights
 
 
 traverse :: (Weight -> Weight) -> NetworkWeights -> NetworkWeights
-traverse operator val = (fmap . fmap) operator val
+traverse operator val = (fmap . fmap . fmap) operator val
 
 
 getNextGeneration :: MutationRate -> CrossoverRate -> NetworkWeights -> NetworkWeights
@@ -88,20 +90,25 @@ getNextGeneration mutationRate crossoverRate weights = weights
 
 
 getInitialWeights :: NodesPerLayer -> IO NetworkWeights
-getInitialWeights nodesPerLayer = replicateM layerCount $ replicateM nodesPerLayer (randomIO :: IO Weight)
+getInitialWeights nodesPerLayer = return [[[1.0]]] -- TODO fix networkOfWeights
     where layerCount = 5
+          singleNodeOfWeights  = replicateM nodesPerLayer (randomIO :: IO Weight)
+          singleLayerOfWeights = take layerCount $ repeat singleNodeOfWeights -- Does this generate new values or repeat the same
+          networkOfWeights     = take layerCount $ repeat singleNodeOfWeights
 
 
 -- TODO Use liquid Haskell to make sure this is a non-empty list
+-- reduce for each layer in the network and check the last value
 makeClassifierWithWeights :: NetworkWeights -> Classifier
 makeClassifierWithWeights (initialWeights:restWeights) = classifier
--- reduce for each layer in the network and check the last value
     where classifier = \_ -> True
-          --myClass = foldl reduceFunction initialWeights restWeights
-          reduceFunction singleLayerWeights singleLayerInput = map mapFunc singleLayerWeights 
-          mapFunc singleLayerInput = boolToWeight . (isActive singleLayerInput)           
+              --myClass = foldr reduceFunction initialWeights restWeights
+
+
+propogateToNextLayer :: NodeInputForLayer -> LayerWeight -> NodeInputForLayer
+propogateToNextLayer singleLayerInput layerOfWeights = propogate singleLayerInput layerOfWeights
+    where propogate singleLayerInput singleLayerWeights = map (mapFunc singleLayerInput) singleLayerWeights 
+          mapFunc singleLayerInput singleNodeWeights = boolToWeight (isActive singleLayerInput singleNodeWeights)
+
           boolToWeight True = 1.0
           boolToWeight False = 0.0
-
-
-
