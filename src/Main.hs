@@ -52,11 +52,12 @@ convertCSV parsedCSV = inject (map getLabeledMushroom) parsedCSV
            
 
 getLabeledMushroom :: AlphaFeatureVector -> LabeledMushroom
-getLabeledMushroom [] = (True, [1,2,3]) -- TODO Convert to Maybe LabeledMushroom
+getLabeledMushroom [] = (True, [1,2,3]) -- TODO Convert to Maybe LabeledMushroom or use Monad transformers
 getLabeledMushroom (edibility : mushroom) = (isEdible edibility, mushroomFeature)
                    where isEdible = (== "e")
                          mushroomFeature = alphaVecToNumericVec mushroom 
-      
+
+                         
 main :: IO ()
 main = do
      mushrooms <- getMushroomData
