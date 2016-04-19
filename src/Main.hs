@@ -22,9 +22,10 @@ calculateAccuracy classifier mushrooms = doubleCorrectlyClassifiedCount / totalM
 
 
 getFoldAccuracy :: FoldCount -> LabeledMushrooms -> Accuracy
-getFoldAccuracy foldCount labeledMushrooms = calculateAccuracy classifier testData
-    where classifier = getClassifier labeledMushrooms 
+getFoldAccuracy foldCount labeledMushrooms = sum accuracies / (fromIntegral foldCount) 
+    where foldClassifiers = [getClassifier labeledMushrooms]
           testData = labeledMushrooms
+          accuracies = zipWith (\classifier foldTestData -> calculateAccuracy classifier foldTestData) foldClassifiers $ take foldCount $ repeat testData
 
 
 foldValidation :: FoldCount -> LabeledMushrooms -> Accuracy
