@@ -92,6 +92,7 @@ getInitialWeights nodesPerLayer = replicateM layerCount $ replicateM nodesPerLay
     where layerCount = 5
 
 
+-- TODO Use liquid Haskell to make sure this is a non-empty list
 makeClassifierWithWeights :: NetworkWeights -> Classifier
 makeClassifierWithWeights (initialWeights:restWeights) = classifier
 -- reduce for each layer in the network and check the last value

@@ -1,3 +1,5 @@
+module Main where
+
 import Text.CSV
 import Text.Parsec.Error
 import Data.Char
