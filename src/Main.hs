@@ -15,24 +15,16 @@ type NumericFeatureVector = [NumericFeature]
 
 
 calculateAccuracy :: Classifier -> LabeledMushrooms -> Accuracy
-calculateAccuracy classifier mushrooms = doubleCorrectlyClassifiedCount / totalMushroomCount
-    where doubleCorrectlyClassifiedCount = fromIntegral correctlyClassifiedCount
-          correctlyClassifiedCount = getCorrectPredictionCount mushrooms classifier
+calculateAccuracy classifier mushrooms = correctlyClassifiedCount / totalMushroomCount
+    where correctlyClassifiedCount = fromIntegral $ getCorrectPredictionCount mushrooms classifier
           totalMushroomCount = fromIntegral $ length mushrooms
 
 
 getFoldAccuracy :: FoldCount -> LabeledMushrooms -> Accuracy
 getFoldAccuracy foldCount labeledMushrooms = sum accuracies / (fromIntegral foldCount) 
-    where foldClassifiers = [getClassifier labeledMushrooms]
-          testData = labeledMushrooms
-          accuracies = zipWith (\classifier foldTestData -> calculateAccuracy classifier foldTestData) foldClassifiers $ take foldCount $ repeat testData
-
-
-foldValidation :: FoldCount -> LabeledMushrooms -> Accuracy
-foldValidation foldCount mushrooms = sum foldAccuracies / totalMushroomCount
-    where partitionedData = [mushrooms] 
-          foldAccuracies = map (getFoldAccuracy foldCount) partitionedData
-          totalMushroomCount = fromIntegral $ length partitionedData
+    where foldClassifiers = take foldCount $ repeat $ getClassifier labeledMushrooms
+          partitionedData = take foldCount $ repeat labeledMushrooms -- TODO Partition data using slicing with list comprehension
+          accuracies = zipWith (\classifier foldTestData -> calculateAccuracy classifier foldTestData) foldClassifiers partitionedData
 
 
 alphaFeatureToNumericFeature :: AlphaFeature -> NumericFeature
@@ -72,5 +64,5 @@ main = do
      --initialWeights <- getInitialWeights nodesPerLayer :: IO NetworkWeights
      --let nextWeights = (getNextGeneration defaultMutationRate defaultCrossoverRate) initialWeights
      -- Make infinite list of generation and pick the nth element for the final classifier
-     print $ fmap (foldValidation 10) mushrooms
+     print $ fmap (getFoldAccuracy 10) mushrooms
 
