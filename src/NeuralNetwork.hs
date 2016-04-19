@@ -102,13 +102,13 @@ getInitialWeights nodesPerLayer = return [[[1.0]]] -- TODO fix networkOfWeights
 makeClassifierWithWeights :: NetworkWeights -> Classifier
 makeClassifierWithWeights (initialWeights:restWeights) = classifier
     where classifier = \_ -> True
-              --myClass = foldr reduceFunction initialWeights restWeights
+          --myClass = foldr propogateToNextLayer initialWeights restWeights
 
 
-propogateToNextLayer :: NodeInputForLayer -> LayerWeight -> NodeInputForLayer
+propogateToNextLayer :: NodeInputForLayer -> LayerWeight -> NodeInputForLayer 
 propogateToNextLayer singleLayerInput layerOfWeights = propogate singleLayerInput layerOfWeights
-    where propogate singleLayerInput singleLayerWeights = map (mapFunc singleLayerInput) singleLayerWeights 
-          mapFunc singleLayerInput singleNodeWeights = boolToWeight (isActive singleLayerInput singleNodeWeights)
+    where propogate singleLayerNodeInput singleLayerWeights = map (mapFunc singleLayerNodeInput) singleLayerWeights 
+          mapFunc singleLayerNodeInput singleNodeWeights = boolToWeight (isActive singleLayerNodeInput singleNodeWeights)
 
           boolToWeight True = 1.0
           boolToWeight False = 0.0
